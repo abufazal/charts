@@ -43,7 +43,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+Application selector labels
 */}}
 {{- define "pihole.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "pihole.name" . }}
