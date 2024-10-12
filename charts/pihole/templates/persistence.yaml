@@ -1,0 +1,39 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pihole.piholePVCName" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- if .Values.persistence.keep }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
+  labels:
+    {{- include "pihole.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.persistence.pihole.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.pihole.size }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pihole.dnsmasqPVCName" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- if .Values.persistence.keep }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
+  labels:
+    {{- include "pihole.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.persistence.dnsmasq.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.dnsmasq.size }}      
+{{- end -}}

@@ -1,0 +1,1000 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [],
+    "properties": {
+        "nameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "relase name override Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "relase full name override Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "image": {
+            "type": "object",
+            "default": {},
+            "title": "pihole image Schema",
+            "required": [
+                "repository",
+                "tag"
+            ],
+            "properties": {
+                "repository": {
+                    "type": "string",
+                    "default": "pihole/pihole",
+                    "title": "image repository Schema",
+                    "examples": [
+                        "pihole/pihole"
+                    ]
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "default": "IfNotPresent",
+                    "title": "image pull policy Schema",
+                    "examples": [
+                        "IfNotPresent"
+                    ]
+                },
+                "tag": {
+                    "type": "string",
+                    "default": "latest",
+                    "title": "image tag Schema",
+                    "examples": [
+                        "latest"
+                    ]
+                },
+                "imagePullSecrets": {
+                    "type": "array",
+                    "default": [],
+                    "title": "image pull secret Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                }
+            },
+            "examples": [{
+                "repository": "pihole/pihole",
+                "pullPolicy": "IfNotPresent",
+                "tag": "latest",
+                "imagePullSecrets": []
+            }]
+        },
+        "deployment": {
+            "type": "object",
+            "default": {},
+            "title": "The deployment Schema",
+            "required": [],
+            "properties": {
+                "replicas": {
+                    "type": "integer",
+                    "default": 1,
+                    "title": "deployment replicas Schema",
+                    "examples": [
+                        3
+                    ]
+                },
+                "timeZone": {
+                    "type": "string",
+                    "default": "Asia/Kolkata",
+                    "title": "deployment time zone Schema",
+                    "examples": [
+                        "Asia/Kolkata"
+                    ]
+                },
+                "dnsPolicy": {
+                    "type": "string",
+                    "default": "",
+                    "title": "pod dns policy Schema",
+                    "examples": [
+                        "None"
+                    ]
+                },
+                "dnsConfig": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod dns config Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "podLabels": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod labels Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod security context Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "securityContext": {
+                    "type": "object",
+                    "default": {},
+                    "title": "deployment security context Schema",
+                    "required": [
+                        "capabilities"
+                    ],
+                    "properties": {
+                        "capabilities": {
+                            "type": "object",
+                            "default": {},
+                            "title": "deployment security capabilities Schema",
+                            "required": [
+                                "add"
+                            ],
+                            "properties": {
+                                "add": {
+                                    "type": "array",
+                                    "default": [],
+                                    "title": "capabilities drop Schema",
+                                    "items": {
+                                        "type": "string",
+                                        "default": "NET_ADMIN",
+                                        "examples": [
+                                            "NET_ADMIN"
+                                        ]
+                                    },
+                                    "examples": [
+                                        [
+                                            "NET_ADMIN"
+                                        ]
+                                    ]
+                                }
+                            },
+                            "examples": [{
+                                "add": [
+                                    "NET_ADMIN"
+                                ]
+                            }]
+                        }
+                    },
+                    "examples": [{
+                        "capabilities": {
+                            "add": [
+                                "NET_ADMIN"
+                            ]
+                        }
+                    }]
+                },
+                "resources": {
+                    "type": "object",
+                    "default": {},
+                    "title": "deployment resources Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "livenessProbe": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod livenessProbe Schema",
+                    "required": [
+                        "httpGet"
+                    ],
+                    "properties": {
+                        "httpGet": {
+                            "type": "object",
+                            "default": {},
+                            "title": "livenessProbe httpGet Schema",
+                            "required": [
+                                "path",
+                                "port"
+                            ],
+                            "properties": {
+                                "path": {
+                                    "type": "string",
+                                    "default": "/",
+                                    "title": "livenessProbe path Schema",
+                                    "examples": [
+                                        "/"
+                                    ]
+                                },
+                                "port": {
+                                    "type": "string",
+                                    "default": "http",
+                                    "title": "livenessProbe port Schema",
+                                    "examples": [
+                                        "http"
+                                    ]
+                                }
+                            },
+                            "examples": [{
+                                "path": "/",
+                                "port": "http"
+                            }]
+                        }
+                    },
+                    "examples": [{
+                        "httpGet": {
+                            "path": "/",
+                            "port": "http"
+                        }
+                    }]
+                },
+                "readinessProbe": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod readinessProbe Schema",
+                    "required": [
+                        "httpGet"
+                    ],
+                    "properties": {
+                        "httpGet": {
+                            "type": "object",
+                            "default": {},
+                            "title": "readinessProbe httpGet Schema",
+                            "required": [
+                                "path",
+                                "port"
+                            ],
+                            "properties": {
+                                "path": {
+                                    "type": "string",
+                                    "default": "/",
+                                    "title": "readinessProbe path Schema",
+                                    "examples": [
+                                        "/"
+                                    ]
+                                },
+                                "port": {
+                                    "type": "string",
+                                    "default": "http",
+                                    "title": "readinessProbe port Schema",
+                                    "examples": [
+                                        "http"
+                                    ]
+                                }
+                            },
+                            "examples": [{
+                                "path": "/",
+                                "port": "http"
+                            }]
+                        }
+                    },
+                    "examples": [{
+                        "httpGet": {
+                            "path": "/",
+                            "port": "http"
+                        }
+                    }]
+                },
+                "autoscaling": {
+                    "type": "object",
+                    "default": {},
+                    "title": "deployment autoscaling Schema",
+                    "required": [
+                        "enabled",
+                        "minReplicas",
+                        "maxReplicas",
+                        "targetCPUUtilizationPercentage"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "autoscaling enabled Schema",
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "minReplicas": {
+                            "type": "integer",
+                            "default": 1,
+                            "title": "autoscaling minReplicas Schema",
+                            "examples": [
+                                1
+                            ]
+                        },
+                        "maxReplicas": {
+                            "type": "integer",
+                            "default": 3,
+                            "title": "autoscaling maxReplicas Schema",
+                            "examples": [
+                                5
+                            ]
+                        },
+                        "targetCPUUtilizationPercentage": {
+                            "type": "integer",
+                            "default": 80,
+                            "title": "autoscaling targetCPUUtilizationPercentage Schema",
+                            "examples": [
+                                80
+                            ]
+                        },
+                        "targetMemoryUtilizationPercentage": {
+                            "type": "integer",
+                            "default": 80,
+                            "title": "autoscaling targetMemoryUtilizationPercentage Schema",
+                            "examples": [
+                                80
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "enabled": true,
+                        "minReplicas": 1,
+                        "maxReplicas": 5,
+                        "targetCPUUtilizationPercentage": 80,
+                        "targetMemoryUtilizationPercentage": 80
+                    }]
+                },
+                "volumes": {
+                    "type": "array",
+                    "default": [],
+                    "title": "deployment volumes Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "volumeMounts": {
+                    "type": "array",
+                    "default": [],
+                    "title": "deployment volumeMounts Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "nodeSelector": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod nodeSelector Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "tolerations": {
+                    "type": "array",
+                    "default": [],
+                    "title": "pod tolerations Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                },
+                "affinity": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pod affinity Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                }
+            },
+            "examples": [{
+                "replicas": 1,
+                "timeZone": "Asia/Kolkata",
+                "dnsPolicy": "",
+                "dnsConfig": {},
+                "podAnnotations": {},
+                "podLabels": {},
+                "podSecurityContext": {},
+                "securityContext": {
+                    "capabilities": {
+                        "add": [
+                            "NET_ADMIN"
+                        ]
+                    }
+                },
+                "resources": {},
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/",
+                        "port": "http"
+                    }
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/",
+                        "port": "http"
+                    }
+                },
+                "autoscaling": {
+                    "enabled": false,
+                    "minReplicas": 1,
+                    "maxReplicas": 5,
+                    "targetCPUUtilizationPercentage": 80,
+                    "targetMemoryUtilizationPercentage": 80
+                },
+                "volumes": [],
+                "volumeMounts": [],
+                "nodeSelector": {},
+                "tolerations": [],
+                "affinity": {}
+            }]
+        },
+        "persistence": {
+            "type": "object",
+            "default": {},
+            "title": "deployment persistence storage Schema",
+            "required": [
+                "enabled",
+                "pihole",
+                "dnsmasq"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "enable persistence Schema",
+                    "examples": [
+                        true
+                    ]
+                },
+                "keep": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "keep persistence Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "pihole": {
+                    "type": "object",
+                    "default": {},
+                    "title": "pihole persistence storage Schema",
+                    "required": [
+                        "storageClassName"
+                    ],
+                    "properties": {
+                        "storageClassName": {
+                            "type": "string",
+                            "default": "",
+                            "title": "pihole persistence storage class Schema",
+                            "examples": [
+                                "longhorn"
+                            ]
+                        },
+                        "size": {
+                            "type": "string",
+                            "default": "4Gi",
+                            "title": "pihole persistence size Schema",
+                            "examples": [
+                                "10Gi"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "storageClassName": "longhorn",
+                        "size": "10Gi"
+                    }]
+                },
+                "dnsmasq": {
+                    "type": "object",
+                    "default": {},
+                    "title": "dnsmasq persistence storage Schema",
+                    "required": [
+                        "storageClassName"
+                    ],
+                    "properties": {
+                        "storageClassName": {
+                            "type": "string",
+                            "default": "",
+                            "title": "dnsmasq persistence storage class Schema",
+                            "examples": [
+                                "longhorn"
+                            ]
+                        },
+                        "size": {
+                            "type": "string",
+                            "default": "100Mi",
+                            "title": "dnsmasq persistence size Schema",
+                            "examples": [
+                                "1Gi"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "storageClassName": "longhorn",
+                        "size": "100Mi"
+                    }]
+                }
+            },
+            "examples": [{
+                "enabled": true,
+                "keep": true,
+                "pihole": {
+                    "storageClassName": "longhorn",
+                    "size": "4Gi"
+                },
+                "dnsmasq": {
+                    "storageClassName": "longhorn",
+                    "size": "100Mi"
+                }
+            }]
+        },
+        "serviceAccount": {
+            "type": "object",
+            "default": {},
+            "title": "deployment serviceAccount Schema",
+            "required": [
+                "create"
+            ],
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "service account create Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "automount": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "service account automount Schema",
+                    "examples": [
+                        true
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "service account annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "title": "service account name Schema",
+                    "examples": [
+                        ""
+                    ]
+                }
+            },
+            "examples": [{
+                "create": true,
+                "automount": true,
+                "annotations": {},
+                "name": ""
+            }]
+        },
+        "service": {
+            "type": "object",
+            "default": {},
+            "title": "deployment service Schema",
+            "required": [
+                "admin",
+                "dns"
+            ],
+            "properties": {
+                "admin": {
+                    "type": "object",
+                    "default": {},
+                    "title": "deployment admin service schema",
+                    "required": [],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "default": "ClusterIP",
+                            "title": "admin service type Schema",
+                            "examples": [
+                                "ClusterIP"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "type": "ClusterIP"
+                    }]
+                },
+                "dns": {
+                    "type": "object",
+                    "default": {},
+                    "title": "deployment dns service Schema",
+                    "required": [],
+                    "properties": {
+                        "loadBalancerIP": {
+                            "type": "string",
+                            "default": "",
+                            "title": "dns service load balancer IP Schema",
+                            "examples": [
+                                "10.27.0.1"
+                            ]
+                        },
+                        "externalTrafficPolicy": {
+                            "type": "string",
+                            "default": "Local",
+                            "title": "dns service externalTrafficPolicy Schema",
+                            "examples": [
+                                "Cluster"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "loadBalancerIP": "10.27.0.1",
+                        "externalTrafficPolicy": "Local"
+                    }]
+                }
+            },
+            "examples": [{
+                "admin": {
+                    "type": "ClusterIP"
+                },
+                "dns": {
+                    "loadBalancerIP": "10.27.0.1",
+                    "externalTrafficPolicy": "Local"
+                }
+            }]
+        },
+        "ingressRoute": {
+            "type": "object",
+            "default": {},
+            "title": "deployment ingress Route Schema",
+            "required": [
+                "enabled",
+                "className",
+                "entryPoints",
+                "domain"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "ingress route enabled Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "className": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress route ingressclass Schema",
+                    "examples": [
+                        "traefik"
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "ingress route annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "entryPoints": {
+                    "type": "array",
+                    "default": [],
+                    "title": "ingress route entryPoints Schema",
+                    "items": {},
+                    "examples": [
+                        [
+                            "web",
+                            "websecure"
+                        ]
+                    ]
+                },
+                "domain": {
+                    "type": "object",
+                    "default": {},
+                    "title": "ingress route domain Schema",
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "default": "",
+                            "title": "ingress route domain name Schema",
+                            "examples": [
+                                "www.example.com"
+                            ]
+                        },
+                        "cert": {
+                            "type": "object",
+                            "default": {},
+                            "title": "ingress domain cert Schema",
+                            "required": [
+                                "issuer"
+                            ],
+                            "properties": {
+                                "issuer": {
+                                    "type": "object",
+                                    "default": {},
+                                    "title": "cert issuer Schema",
+                                    "required": [
+                                        "name",
+                                        "type"
+                                    ],
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "default": "",
+                                            "title": "cert issuer name Schema",
+                                            "examples": [
+                                                "cisr.letsencrypt.prod"
+                                            ]
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "default": "",
+                                            "title": "cert issuer type Schema",
+                                            "examples": [
+                                                "ClusterIssuer"
+                                            ]
+                                        }
+                                    },
+                                    "examples": [{
+                                        "name": "cisr.letsencrypt.prod",
+                                        "type": "ClusterIssuer"
+                                    }]
+                                }
+                            },
+                            "examples": [{
+                                "issuer": {
+                                    "name": "cisr.letsencrypt.prod",
+                                    "type": "ClusterIssuer"
+                                }
+                            }]
+                        }
+                    },
+                    "examples": [{
+                        "name": "www.example.com",
+                        "cert": {
+                            "issuer": {
+                                "name": "cisr.letsencrypt.prod",
+                                "type": "ClusterIssuer"
+                            }
+                        }
+                    }]
+                }
+            },
+            "examples": [{
+                "enabled": true,
+                "className": "traefik",
+                "annotations": {},
+                "entryPoints": [
+                    "websecure"
+                ],
+                "domain": {
+                    "name": "www.example.com",
+                    "cert": {
+                        "issuer": {
+                            "name": "cisr.letsencrypt.prod",
+                            "type": "ClusterIssuer"
+                        }
+                    }
+                }
+            }]
+        },
+        "ingress": {
+            "type": "object",
+            "default": {},
+            "title": "The ingress Schema",
+            "required": [
+                "enabled",
+                "ingressClassName",
+                "host",
+                "tls",
+                "secureBackends",
+                "tlsSecret",
+                "path",
+                "pathType",
+                "secrets"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "ingress enable Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "ingressClassName": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress ingressclass Schema",
+                    "examples": [
+                        null
+                    ]
+                },
+                "host": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress host Schema",
+                    "examples": [
+                        "www.example.com"
+                    ]
+                },
+                "tls": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "ingress tls Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "secureBackends": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "ingress secureBackends Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "tlsSecret": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress tlsSecret Schema",
+                    "examples": [
+                        "pihole.local-tls"
+                    ]
+                },
+                "path": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress path Schema",
+                    "examples": [
+                        "/admin"
+                    ]
+                },
+                "pathType": {
+                    "type": "string",
+                    "default": "",
+                    "title": "ingress pathType Schema",
+                    "examples": [
+                        "ImplementationSpecific"
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "ingress annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "secrets": {
+                    "type": "array",
+                    "default": [],
+                    "title": "ingress tls secrets Schema",
+                    "examples": [
+                    ]
+                }
+            },
+            "examples": [{
+                "enabled": true,
+                "ingressClassName": "nginx",
+                "host": "www.example.com",
+                "tls": true,
+                "secureBackends": false,
+                "tlsSecret": "pihole.local-tls",
+                "path": "/admin",
+                "pathType": "ImplementationSpecific",
+                "annotations": [{}],
+                "secrets": "pihole-tls"
+            }]
+        }
+    },
+    "examples": [{
+        "nameOverride": "",
+        "fullnameOverride": "",
+        "image": {
+            "repository": "pihole/pihole",
+            "pullPolicy": "IfNotPresent",
+            "tag": "latest",
+            "imagePullSecrets": []
+        },
+        "deployment": {
+            "replicas": 1,
+            "timeZone": "Asia/Kolkata",
+            "dnsPolicy": "",
+            "dnsConfig": {},
+            "podAnnotations": {},
+            "podLabels": {},
+            "podSecurityContext": {},
+            "securityContext": {
+                "capabilities": {
+                    "add": [
+                        "NET_ADMIN"
+                    ]
+                }
+            },
+            "resources": {},
+            "livenessProbe": {
+                "httpGet": {
+                    "path": "/",
+                    "port": "http"
+                }
+            },
+            "readinessProbe": {
+                "httpGet": {
+                    "path": "/",
+                    "port": "http"
+                }
+            },
+            "autoscaling": {
+                "enabled": false
+            },
+            "volumes": [],
+            "volumeMounts": [],
+            "nodeSelector": {},
+            "tolerations": [],
+            "affinity": {}
+        },
+        "persistence": {
+            "enabled": true,
+            "keep": true,
+            "pihole": {
+                "storageClassName": "",
+                "size": "4Gi"
+            },
+            "dnsmasq": {
+                "storageClassName": "",
+                "size": "100Mi"
+            }
+        },
+        "serviceAccount": {
+            "create": true,
+            "automount": true,
+            "annotations": {},
+            "name": ""
+        },
+        "service": {
+            "admin": {
+                "type": "ClusterIP"
+            },
+            "dns": {
+                "loadBalancerIP": "10.27.0.1",
+                "externalTrafficPolicy": "Local"
+            }
+        },
+        "ingressRoute": {
+            "enabled": false,
+            "className": "",
+            "annotations": {},
+            "entryPoints": [],
+            "domain": {
+                "name": "www.example.com",
+                "cert": {
+                    "issuer": {
+                        "name": "",
+                        "type": "ClusterIssuer"
+                    }
+                }
+            }
+        },
+        "ingress": {
+            "enabled": false,
+            "ingressClassName": null,
+            "host": "www.example.com",
+            "tls": false,
+            "secureBackends": false,
+            "tlsSecret": "pihole.local-tls",
+            "path": "/admin",
+            "pathType": "ImplementationSpecific",
+            "annotations": {},
+            "secrets": ""
+        }
+    }]
+}

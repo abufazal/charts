@@ -1,0 +1,25 @@
+{{- if and .Values.ingressRoute.enabled (not (empty .Values.ingressRoute.domain.cert.issuer.name)) (not (empty .Values.ingressRoute.domain.cert.issuer.type)) }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "pihole.domainCertName" . }}
+  labels:
+    {{- include "pihole.labels" . | nindent 4 }}  
+  namespace: cert-manager
+spec:
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: {{ .Release.Namespace }}
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: {{ include "pihole.reflectNamespaces" . }}
+    labels:
+      {{- include "pihole.labels" . | nindent 6 }}  
+  secretName: {{ include "pihole.domainCertSecretName" . }}
+  issuerRef:
+    name: {{ .Values.ingressRoute.domain.cert.issuer.name }}
+    kind: {{ .Values.ingressRoute.domain.cert.issuer.type }}
+  commonName: {{ .Values.ingressRoute.domain.name }}
+  dnsNames:
+  - {{ .Values.ingressRoute.domain.name }}
+{{- end }}
