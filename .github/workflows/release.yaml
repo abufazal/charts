@@ -25,7 +25,7 @@ jobs:
         uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: ./charts
-          mark_as_latest: true
+          mark_as_latest: false
           pages_branch: release
           packages_with_index: true
         env:
