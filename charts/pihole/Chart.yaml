@@ -1,0 +1,12 @@
+apiVersion: v2
+name: pihole
+description: A Helm chart for pihole
+type: application
+version: 0.1.3
+maintainers:
+- email: abufazal@users.noreply.github.com
+  name: Abu Fazal Abbas
+sources:
+- https://github.com/abufazal/charts/
+- https://github.com/abufazal/charts/pihole
+appVersion: "latest"

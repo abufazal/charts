@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pihole.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "pihole.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.deployment.autoscaling.enabled }}
+    {{- if .Values.persistence.enabled }}
+  replicas: {{ .Values.deployment.replicas }}
+    {{- else }}
+  replicas: 1
+    {{- end }}
+  {{- else }}
+    {{- if not .Values.persistence.enabled }}
+  replicas: 1
+    {{- end }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pihole.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pihole.labels" . | nindent 8 }}
+        {{- with .Values.deployment.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec: 
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets: 
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pihole.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.deployment.podSecurityContext | nindent 8 }}
+      containers:        
+        - name: {{ .Chart.Name }}
+          env:
+            - name: TZ
+              value: {{ .Values.deployment.timeZone }}
+          securityContext:
+            {{- toYaml .Values.deployment.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: dhcp
+              containerPort: 67
+              protocol: UDP
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP                    
+          livenessProbe:
+            {{- toYaml .Values.deployment.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.deployment.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.deployment.volumeMounts }}
+            {{- toYaml .Values.deployment.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- if .Values.persistence.enabled }}
+            - name: pvc-etc
+              mountPath: /etc/pihole
+            - name: pvc-dnsmasq
+              mountPath: /etc/dnsmasq.d
+            {{- end }}
+      volumes:
+        {{- if .Values.deployment.volumes }}
+        {{- toYaml .Values.deployment.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
+        - name: pvc-etc
+          persistentVolumeClaim:
+            claimName: {{ include "pihole.piholePVCName" . }}
+        - name: pvc-dnsmasq
+          persistentVolumeClaim:
+            claimName: {{ include "pihole.dnsmasqPVCName" . }}
+        {{- end }}
+      dnsPolicy: {{ .Values.deployment.dnsPolicy }}
+      {{- with .Values.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
