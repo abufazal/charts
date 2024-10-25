@@ -1,4 +1,5 @@
-{{- if .Values.persistence.enabled }}
+{{- if and .Values.pihole.deployment.persistence.enabled }}
+  {{- if not .Values.pihole.deployment.persistence.pihole.existingClaimName }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -13,10 +14,14 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  {{- include "pihole.validateValue" list .Values.pihole.deployment.persistence.pihole.storageClassName "Error - Storage class name is not provider for pihole volume" -}}  
   storageClassName: {{ .Values.persistence.pihole.storageClassName }}
   resources:
     requests:
-      storage: {{ .Values.persistence.pihole.size }}
+      storage: {{ .Values.persistence.pihole.size | default "4Gi" }}
+  {{- end -}}
+
+  {{- if not .Values.pihole.deployment.persistence.dnsmasq.existingClaimName }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -32,8 +37,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  {{- include "pihole.validateValue" list .Values.pihole.deployment.persistence.dnsmasq.storageClassName "Error - Storage class name is not provider for dnsmasq volume" -}}  
   storageClassName: {{ .Values.persistence.dnsmasq.storageClassName }}
   resources:
     requests:
-      storage: {{ .Values.persistence.dnsmasq.size }}      
+      storage: {{ .Values.persistence.dnsmasq.size | default "100Mi" }}      
+  {{- end -}}      
 {{- end -}}

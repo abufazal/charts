@@ -1,7 +1,7 @@
-{{- if .Values.ingressRoute.enabled }}
-  {{- if .Values.ingressRoute.className }}
-    {{- if not (hasKey .Values.ingressRoute.annotations "kubernetes.io/ingress.class") }}
-    {{- $_ := set .Values.ingressRoute.annotations "kubernetes.io/ingress.class" .Values.ingressRoute.className }}
+{{- if .Values.pihole.deployment.ingressRoute.enabled }}
+  {{- if .Values.pihole.deployment.ingressRoute.className }}
+    {{- if not (hasKey .Values.pihole.deployment.ingressRoute.annotations "kubernetes.io/ingress.class") }}
+    {{- $_ := set .Values.pihole.deployment.ingressRoute.annotations "kubernetes.io/ingress.class" .Values.pihole.deployment.ingressRoute.ingressClassName }}
     {{- end }}
   {{- end }}
 apiVersion: traefik.io/v1alpha1
@@ -11,23 +11,24 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "pihole.labels" . | nindent 4 }}
-  {{- with .Values.ingressRoute.annotations }}
+  {{- with .Values.pihole.deployment.ingressRoute.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   entryPoints:
-    {{- range .Values.ingressRoute.entryPoints }}
+    {{- include "pihole.validateValue" list .Values.pihole.deployment.ingressRoute.entryPoints "Error - Ingress entrypoint is not provided." -}}
+    {{- range .Values.pihole.deployment.ingressRoute.entryPoints }}
     - {{ . }}
     {{- end }}
   routes:
-    - match: {{ include "pihole.ingressRoute" . }}
+    - match: {{ include "pihole.ingressHost" . }}
       kind: Rule
       services:
         - name: {{ include "pihole.adminServiceName" . }}
           namespace: {{ .Release.Namespace }}
           port: 80
-  {{- if and (not (empty .Values.ingressRoute.domain.cert.issuer.name)) (not (empty .Values.ingressRoute.domain.cert.issuer.type)) }}
+  {{- if and (not (empty .Values.pihole.deployment.ingressRoute.domain.cert.issuer.name)) (not (empty .Values.pihole.deployment.ingressRoute.domain.cert.issuer.type)) }}
   tls:
     secretName: {{ include "pihole.domainCertSecretName" . }}
   {{- end }}

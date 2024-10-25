@@ -6,10 +6,6 @@ version: 0.2.3
 sources:
 - https://github.com/abufazal/charts/
 - https://github.com/abufazal/charts/pihole
-dependencies:
-  - name: common
-    version: 2.x.x
-    repository: oci://registry-1.docker.io/bitnamicharts
 maintainers:
 - email: abbas0013@gmail.com
   name: Abu Fazal Abbas

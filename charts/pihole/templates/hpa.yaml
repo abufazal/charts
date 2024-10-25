@@ -1,4 +1,4 @@
-{{- if and .Values.deployment.autoscaling.enabled .Values.persistence.enabled }}
+{{- if and .Values.pihole.deployment.autoscaling.enabled .Values.pihole.persistence.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -10,23 +10,19 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "pihole.fullname" . }}
-  minReplicas: {{ .Values.deployment.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.deployment.autoscaling.maxReplicas }}
+  minReplicas: {{ default 1 .Values.pihole.deployment.autoscaling.minReplicas }}
+  maxReplicas: {{ default 3 .Values.pihole.deployment.autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.deployment.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.deployment.autoscaling.targetCPUUtilizationPercentage }}
-    {{- end }}
-    {{- if .Values.deployment.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ default 80 .Values.pihole.deployment.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.deployment.autoscaling.targetMemoryUtilizationPercentage }}
-    {{- end }}
+          averageUtilization: {{ default 80 .Values.pihole.deployment.autoscaling.targetMemoryUtilizationPercentage }}
 {{- end }}

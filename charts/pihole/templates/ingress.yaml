@@ -1,7 +1,7 @@
-{{- if .Values.ingress.enabled }}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.ingressClassName }}
+{{- if .Values.pihole.deployment.ingress.enabled }}
+{{- if and .Values.pihole.deployment.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.pihole.deployment.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.pihole.deployment.ingress.annotations "kubernetes.io/ingress.class" .Values.pihole.deployment.ingress.ingressClassName }}
   {{- end }}
 {{- end }}
 apiVersion: networking.k8s.io/v1
@@ -11,32 +11,32 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels: 
     {{- include "pihole.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.pihole.deployment.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-    {{- if .Values.ingress.secureBackends }}
+    {{- if .Values.pihole.deployment.ingress.secureBackends }}
     ingress.kubernetes.io/secure-backends: "true"
     {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- if .Values.pihole.deployment.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.pihole.deployment.ingress.ingressClassName }}
   {{- end }}
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ .Values.pihole.deployment.ingress.host }}
     http:
       paths:
-        - path: {{ default "/admin" .Values.ingress.path }}
-          pathType: {{ default "ImplementationSpecific" .Values.ingress.pathType }}
+        - path: {{ default "/admin" .Values.pihole.deployment.ingress.path }}
+          pathType: {{ default "ImplementationSpecific" .Values.pihole.deployment.ingress.pathType }}
           backend:
             service:
               name: {{ include "pihole.adminServiceName" . }}
               port:
                 number: 80
-{{- if .Values.ingress.tls }}
+{{- if .Values.pihole.deployment.ingress.tls }}
   tls:
   - hosts:
-    - {{ .Values.ingress.host }}
-    secretName: {{ .Values.ingress.tlsSecret }}
+    - {{ .Values.pihole.deployment.ingress.host }}
+    secretName: {{ .Values.pihole.deployment.ingress.tlsSecret }}
 {{- end }}
 {{- end }}

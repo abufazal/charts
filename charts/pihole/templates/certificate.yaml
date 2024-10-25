@@ -1,4 +1,4 @@
-{{- if and .Values.ingressRoute.enabled (not (empty .Values.ingressRoute.domain.cert.issuer.name)) (not (empty .Values.ingressRoute.domain.cert.issuer.type)) }}
+{{- if and .Values.pihole.ingressRoute.enabled .Values.pihole.ingressRoute.tls.enabled (empty .Values.pihole.ingressRoute.tls.secret) }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -17,9 +17,12 @@ spec:
       {{- include "pihole.labels" . | nindent 6 }}  
   secretName: {{ include "pihole.domainCertSecretName" . }}
   issuerRef:
-    name: {{ .Values.ingressRoute.domain.cert.issuer.name }}
-    kind: {{ .Values.ingressRoute.domain.cert.issuer.type }}
-  commonName: {{ .Values.ingressRoute.domain.name }}
+    {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.tls.cert.issuerName "Error: Certificate Issuer Name .Values.pihole.ingressRoute.tls.cert.issuerName is not provided" -}}
+    name: {{ .Values.pihole.deployment.ingressRoute.domain.cert.issuer.name }}
+    {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.tls.cert.issuerType "Error: Certificate Issuer Type .Values.pihole.ingressRoute.tls.cert.issuerType is not provided" -}}
+    kind: {{ .Values.pihole.deployment.ingressRoute.domain.cert.issuer.type }}
+  {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.host "Error: IngressRoute host is not provided" -}}
+  commonName: {{ .Values.pihole.deployment.ingressRoute.host }}
   dnsNames:
-  - {{ .Values.ingressRoute.domain.name }}
+  - {{ .Values.pihole.deployment.ingressRoute.host }}
 {{- end }}

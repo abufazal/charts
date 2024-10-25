@@ -6,14 +6,14 @@ metadata:
   labels:
     {{- include "pihole.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.deployment.autoscaling.enabled }}
-    {{- if .Values.persistence.enabled }}
-  replicas: {{ .Values.deployment.replicas }}
+  {{- if not .Values.pihole.deployment.autoscaling.enabled }}
+    {{- if .Values.pihole.deployment.persistence.enabled }}
+  replicas: {{ .Values.pihole.deployment.replicas }}
     {{- else }}
   replicas: 1
     {{- end }}
   {{- else }}
-    {{- if not .Values.persistence.enabled }}
+    {{- if not .Values.pihole.deployment.persistence.enabled }}
   replicas: 1
     {{- end }}
   {{- end }}
@@ -22,32 +22,32 @@ spec:
       {{- include "pihole.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.deployment.podAnnotations }}
+      {{- with .Values.pihole.deployment.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "pihole.labels" . | nindent 8 }}
-        {{- with .Values.deployment.podLabels }}
+        {{- with .Values.pihole.deployment.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec: 
-      {{- with .Values.image.imagePullSecrets }}
+      {{- with .Values.pihole.image.pullSecrets }}
       imagePullSecrets: 
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "pihole.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.deployment.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.pihole.deployment.podSecurityContext | nindent 8 }}
       containers:        
         - name: {{ .Chart.Name }}
           env:
             - name: TZ
-              value: {{ .Values.deployment.timeZone }}
+              value: {{ .Values.pihole.timeZone }}
           securityContext:
-            {{- toYaml .Values.deployment.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.pihole.deployment.securityContext | nindent 12 }}
+          image: {{ include "pihole.image" . }}
+          imagePullPolicy: {{ .Values.pihole.image.pullPolicy }}
           ports:
             - name: dns-tcp
               containerPort: 53
@@ -65,26 +65,26 @@ spec:
               containerPort: 443
               protocol: TCP                    
           livenessProbe:
-            {{- toYaml .Values.deployment.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.pihole.deployment.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.deployment.readinessProbe | nindent 12 }}
+            {{- toYaml .Values.pihole.deployment.readinessProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.deployment.resources | nindent 12 }}
+            {{- toYaml .Values.pihole.deployment.resources | nindent 12 }}
           volumeMounts:
-            {{- if .Values.deployment.volumeMounts }}
-            {{- toYaml .Values.deployment.volumeMounts | nindent 12 }}
+            {{- if .Values.pihole.deployment.volumeMounts }}
+            {{- toYaml .Values.pihole.deployment.volumeMounts | nindent 12 }}
             {{- end }}
-            {{- if .Values.persistence.enabled }}
+            {{- if .Values.pihole.deployment.persistence.enabled }}
             - name: pvc-etc
               mountPath: /etc/pihole
             - name: pvc-dnsmasq
               mountPath: /etc/dnsmasq.d
             {{- end }}
       volumes:
-        {{- if .Values.deployment.volumes }}
-        {{- toYaml .Values.deployment.volumes | nindent 8 }}
+        {{- if .Values.pihole.deployment.volumes }}
+        {{- toYaml .Values.pihole.deployment.volumes | nindent 8 }}
         {{- end }}
-        {{- if .Values.persistence.enabled }}
+        {{- if .Values.pihole.deployment.persistence.enabled }}
         - name: pvc-etc
           persistentVolumeClaim:
             claimName: {{ include "pihole.piholePVCName" . }}
@@ -92,20 +92,19 @@ spec:
           persistentVolumeClaim:
             claimName: {{ include "pihole.dnsmasqPVCName" . }}
         {{- end }}
-      dnsPolicy: {{ .Values.deployment.dnsPolicy }}
-      {{- with .Values.deployment.dnsConfig }}
+      {{- with .Values.pihole.deployment.dnsConfig }}
       dnsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.deployment.nodeSelector }}
+      {{- with .Values.pihole.deployment.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.deployment.affinity }}
+      {{- with .Values.pihole.deployment.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.deployment.tolerations }}
+      {{- with .Values.pihole.deployment.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

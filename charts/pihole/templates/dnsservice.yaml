@@ -22,6 +22,6 @@ spec:
       targetPort: 67
   selector:
     {{- include "pihole.selectorLabels" . | nindent 4 }}
-  {{- if .Values.service.dns.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.service.dns.loadBalancerIP | quote }}
+  {{- if .Values.pihole.services.dns.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.pihole.services.dns.loadBalancerIP | quote }}
   {{- end }}
