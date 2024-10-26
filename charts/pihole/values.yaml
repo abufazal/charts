@@ -2,250 +2,318 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into pihole helm templates.
 
-# override the helm release name
+#--- nameOverride overrides the helm release name
 nameOverride: ""
-
-# override the complete fully qualified name for the helm release
+#--- fullnameOverride overrides the complete fully qualified name for the helm release
 fullnameOverride: ""
+#--- namespaceOverride overrides the namespace for helm release
+namespaceOverride: ""
 
-# parameters to specify the deployment image properties
-image:
-  # specify the image repository url
-  repository: pihole/pihole
+#--- global block is used to specify universal values
+global:
+  #--- global.image block is used to specify the global docker image properties
+  image:
+    #--- global.image.imageRegistry specifies the global image registry
+    imageRegistry: ""
+    #--- global.image.imagePullSecrets specifies the image pull secrets for global registry
+    imagePullSecrets: []
+    # Example
+    # imagePullSecrets
+    #   - secret.docker.img.pull
+    #
+  #--- global.storageClassName specifies storage class for persistent volumes  
+  storageClassName: ""
 
-  # specify the image pull policy. (Example InfNotPresent, Always, Never)
-  pullPolicy: IfNotPresent
-
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
-
-  # specify any secrets required to pull the image from repository
-  imagePullSecrets: []
-
-# parameters to specify deployment properties
-deployment:
-  # specify the deployment replica count.
-  replicas: 1
-
-  # specify the deployment time zone
-  timeZone: Asia/Kolkata
-
-  # specify the deployment pod's dns policy
-  dnsPolicy: ""
-
-  # specify the deployment pod's dns configuration
-  dnsConfig: {}
-
-  # specify the deployment pod's annotations
-  podAnnotations: {}
-
-  # specify the deployment pod's custom labels
-  podLabels: {}
-
-  # specify the deployment pod's security context
-  podSecurityContext: {}
-    # fsGroup: 2000
-
-  # specify the deploment's security context  
-  securityContext:
-    capabilities:
-      add:
-        - NET_ADMIN
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
-  
-  # specify the deployment pod's resource limits
-  resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-  # specify the deployment pod's livenessProbe settings
-  livenessProbe:
-    httpGet:
-      path: /admin
-      port: http
-
-  # specify the deployment pod's readinessProbe settings      
-  readinessProbe:
-    httpGet:
-      path: /admin
-      port: http
-
-  # specify the deployment's autoscaling settings. When enabled, deployment.replicas will be ineffective
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: 80
-  
-  # specify additional volumes for the deployment pods
-  volumes: []
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
-
-  # specify additional volumeMounts for the deployment pods
-  volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
-  
-  # specify node selector for the deployment pods
-  nodeSelector: {}
-
-  # specify tolerations for the deployment pods
-  tolerations: []
-
-  # specify affinity for the deployment pods
-  affinity: {}
-
-# specify persistence storage for the deployment
-persistence:
-  # specify whether to enable persistence storage
-  enabled: false
-
-  # specify whether to retain the PVC upon uninstall
-  keep: true
-
-  # specify persistence storage for the /etc/pihole mount path
-  pihole:
-    # specify the storage class for the pihole persistent volume
-    storageClassName: ""
-
-    # specify the storage size for the pihole persistent volume
-    size: 4Gi
-
-  # specify the persistence storage for /etc/dnsmasq mount path
-  dnsmasq:
-    # specify the storage class for the dnsmasq persistent volume
-    storageClassName: ""
-    
-    # specify the storage size for the pihole persistent volume 
-    size: 100Mi
-
-# specify the RBAC service account settings for the deployment
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-
-  # Annotations to add to the service account
-  annotations: {}
-
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-# specify the pihole deployment services settings
-service:
-  # specify the settings for admin dashboard service
-  admin:
-    # specify the service type for the admin dashboard service. (Examples - ClusterIP, LoadBlancer, NodePort)
-    type: ClusterIP
-  
-  # specify the settings for the DNS service
-  dns:
-    # specify the Load Balancer IP for DNS service. If not set, will use IP allocated by the cluster load balancer.
-    loadBalancerIP: ""
-
-    # specify the external traffic policy for DNS service
-    externalTrafficPolicy: "Local"
-
-# specify the settings for admin dasboard ingress route
-ingressRoute:
-  # setting that allows you to generate ingressroute record for the pihole admin dashboard service
-  enabled: false
-
-  # specify the ingress class name
-  className: ""
-  
-  # specify the ingress route annotations
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-
-  # specify the ingress route entrypoints  
-  entryPoints: []
-    # - web
-    # - websecure  
-  
-  # specify the admin dashboard ingress domain settings
-  domain:
-    # specify the name of the ingress domain
-    name: "www.example.com"
-    
-    # specify the ingress domain's certificate issuer details
-    cert:
-      issuer:
-        # specify the name of the certificate issuer
+#--- Pi-hole specific settings
+pihole:  
+  #--- pihole.image specifies Pi-Hole specific image properties
+  image:
+    #--- pihole.image.registry specifies Pi-Hole image registry
+    registry: docker.io
+    #--- pihole.image.repository specifies the Pi-Hole image repository url
+    repository: pihole/pihole
+    #--- pihole.image.tag overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    #--- pihole.image.pullPolicy specifies the Pi-Hole image pull policy. (Example InfNotPresent, Always, Never)
+    pullPolicy: IfNotPresent    
+    #--- pihole.image.pullSecrets specifies any secrets required to pull the Pi-Hole image from repository
+    pullSecrets: []
+    #
+  #--- pihole.dashboard specifies Pi-Hole admin dashboard specific settigs
+  dashboard:
+    #--- pihole.dashboard.admin specifies the Pi-Hole UI admin user details
+    admin:
+      #--- pihole.dashboard.admin.email specifies the email of the Pi-Hole UI admin user
+      email: ""
+      #--- pihole.dashboard.admin.password specifies the Pi-Hole UI admin user credential. Alternatively, you can use an existing secret using `passwordSecret`
+      password: ""
+      #--- pihole.dashboard.admin.passwordSecret specifies the existing secret details to fetch the Pi-Hole UI admin user credential
+      passwordSecret:
+        #--- pihole.dashboard.admin.passwordSecret.name specifies the name of the existing secret
         name: ""
-        
-        # specify the type of the certificate issuer. Example (ClusterIssuer, Issuer)
-        type: ClusterIssuer
+        #--- pihole.dashboard.admin.passwordSecret.key specifies the key to be used to fetch the existing secret
+        key: ""
+        #--- pihole.dashboard.admin.passwordSecret.namespace specifies the namespace of the existing secret
+        namespace: ""
+        #
+    #--- pihole.dashboard.theme specifies the Pi-hole admin UI dashboard theme. Allowed values ["default-dark", "default-darker" , "default-light" , "default-auto"]
+    theme: default-auto 
+    #--- pihole.dashboard.temperatureUnit specifies the temperature unit for the Pi-hole admin UI dashboard. Allowed values ["c" - centigrade, "f" - ferhenhite, "k" - kelvin] 
+    temperatureUnit: "c"
+    #--- pihole.dashboard.boxedLayout specifies whether to use boxed layout for the Pi-hole admin UI dashboard
+    boxedLayout: true    
+    #
+  #--- pihole.timeZone specifies the timezone for Pi-hole 
+  timeZone: Asia/Kolkata
+  #--- pihole.upstream specifies the Pi-hole upstream dns nameservers. Default is using Cloudflare public DNS servers
+  upstream: [
+    "1.1.1.1",
+    "1.1.1.2"
+  ]
+  #--- pihole.queryLogging specifies whether to enable query logging in Pi-hole
+  queryLogging: true
+  #--- pihole.dnssec.enabled specifies whether to enabke DNSSEC in pihole
+  dnssec:
+    enabled: true
+  #--- pihole.privateRangeForwarding.enabled specifies whether to enable private ip range forwarding in Pi-hole
+  privateRangeForwarding:
+    enabled: false
+  #--- pihole.requiredFqdb specifies whether FQDN is required in Pi-hole  
+  requiredFqdn: true
+  #--- pihole.reverseServer specifies the reverse server settings for Pi-hole
+  reverseServer:
+    #--- pihole.reverseServer.enabled specifies whether to enable resverse server in Pi-hole
+    enabled: false
+    #--- pihole.reverseSercer.domain specified the Pi-hole reverse server domain name
+    domain: ""
+    #--- pihole.reverseServer.target specifies the Pi-hole reverse server target
+    target: ""
+    #--- pihole.reverseServer.cidr specifies the Pi-hole reverse server CIDR
+    cidr: ""
 
-
-ingress:
-  # -- Setting that allows pihole to generate ingress records for the pihole admin dashboard service.
-  enabled: false
-
-  # -- IngressClass resource that contains ingress configuration, including the name of the Ingress controller.
-  # ingressClassName can replace the kubernetes.io/ingress.class annotation used in earlier Kubernetes releases.
-  ingressClassName: ""
-
-  # -- Hostname of the Layer 7 load balancer.
-  host: "www.example.com"
-
-  # -- Setting that allows you to enable TLS on ingress records.
-  tls: false
-
-  # -- Setting that allows you to enable secure connections to the pihole admin dashboard service via port 443.
-  secureBackends: false
-
-  # -- TLS secret that contains the private key and certificate to be used for TLS. This setting applies only when TLS is enabled on ingress records.
-  tlsSecret: pihole.local-tls
-
-  # -- Default ingress path. You can access the pihole admin dashboard by following the full ingress path {{host}}+{{path}}.
-  path: /admin
-
-  # -- Ingress path type. To maintain backward compatibility, the default value is "ImplementationSpecific".
-  pathType: ImplementationSpecific
-
-  ## If you're using kube-lego, you will want to add:
-  ## kubernetes.io/tls-acme: true
-  ##
-  ## For a full list of possible ingress annotations, please see
-  ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/annotations.md
-  ##
-  ## If tls is set to true, annotation ingress.kubernetes.io/secure-backends: "true" will automatically be set
-  # -- Ingress annotations in the form of key-value pairs.
-  annotations: {}
-  #  kubernetes.io/ingress.class: nginx
-  #  kubernetes.io/tls-acme: true
-
-  # -- Secret that contains a TLS private key and certificate. Use secrets if you want to use your own certificates to secure ingresses.
-  secrets: []
-  ## If you're providing your own certificates, please use this to add the certificates as secrets
-  ## key and certificate should start with -----BEGIN CERTIFICATE----- or
-  ## -----BEGIN RSA PRIVATE KEY-----
-  ##
-  ## name should line up with a tlsSecret set further up
-  ## If you're using kube-lego, this is unneeded, as it will create the secret for you if it is not set
-  ##
-  ## It is also possible to create and manage the certificates outside of this helm chart
-  ## Please see README.md for more information
-  # - name: pihole.local-tls
-  #   key:
-  #   certificate:
+  #--- pihole.deployment block is used to specify the Pi-hole deployment properties
+  deployment:
+    #--- pihole.deployment.replicas specifies the Pi-hole deployment replica count.    
+    replicas: 1
+    # persistence must be enabled for HA replicas to work.
+    #--- pihole.deployment.dnsConfig specifies the Pi-hole deployment pod's DNS configuration (/etc/resolve.conf)
+    dnsConfig: {}
+    #--- pihole.deployment.podAnnotations specifies the Pi-hole deployment pod's annotations
+    podAnnotations: {}
+    #--- pihole.deployment.podLabels specifies the Pi-hole deployment pod's custom labels
+    podLabels: {}
+    #--- pihole.deployment.podSecurityContext specifies the Pi-hole deployment pod's security context
+    podSecurityContext: {}
+      # fsGroup: 2000
+      #
+    #--- pihole.deployment.securityContext specifies the Pi-hole deploment's security context  
+    securityContext:
+      capabilities:
+        add:
+          - NET_ADMIN
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+      #    
+    #--- pihole.deployment.resources specifies the Pi-hole deployment pod's resource limits
+    resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+    #--- pihole.deployment.livenessProbe specifies the Pi-hole deployment pod's livenessProbe settings
+    livenessProbe:
+      httpGet:
+        path: /admin
+        port: 80
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 10
+      successThreshold: 1
+    #--- pihole.deployment.readinessProbe specifies the Pi-hole deployment pod's readinessProbe settings      
+    readinessProbe:
+      httpGet:
+        path: /admin
+        port: 80
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 10
+      successThreshold: 1
+    #--- pihole.deployment.autoscaling specifies the Pi-hole deployment's autoscaling settings. When enabled, deployment.replicas will be ineffective.     
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    # This feature requires persistence to be enabled.  
+    #--- pihole.deployment.volumes specifies additional volumes for the Pi-hole deployment pods
+    volumes: []
+    # - name: foo
+    #   secret:
+    #     secretName: mysecret
+    #     optional: false
+    #
+    #--- pihole.deployment.volumeMounts specifies additional volumeMounts for the Pi-hole deployment pods
+    volumeMounts: []
+    # - name: foo
+    #   mountPath: "/etc/foo"
+    #   readOnly: true
+    #
+    #--- pihole.deployment.nodeSelector specifies node selector for the Pi-hole deployment pods
+    nodeSelector: {}
+    #--- pihole.deployment.tolerations specifies tolerations for the Pi-hole deployment pods
+    tolerations: []
+    #--- pihole.deployment.affinity specifies affinity for the Pi-hole deployment pods
+    affinity: {}
+    #
+  #--- pihole.persistence block is used to specify persistence storage settings for the Pi-hole deployment
+  persistence:
+    #--- pihole.persistence.enabled specifies whether to enable persistence storage for Pi-hole
+    enabled: false
+    #--- pihole.persistence.keep specifies whether to retain the persistence storage upon uninstall
+    keep: true
+    #--- pihole.persistence.data block is used to specify persistence storage for the Pi-hole primary filesystem (/etc/pihole)
+    data:
+      #--- pihole.persistence.data.existingClaimName specifies the name of existing persistent volumne claim to be used for Pi-hole primary filesystem 
+      existingClaimName: ""
+      #--- pihole.persistence.data.storageClassName specifies the persistence storage class for the Pi-hole primary filesystem when existing claim is not used
+      storageClassName: ""
+      #--- pihole.persistence.data.size specifies the storage size for the persistence volume of Pi-hole primary filesystem
+      size: 4Gi
+      #
+    #--- pihole.persistence.dnsmasq block is used to specify the persistence storage for the Pi-hole dnsmasq filesyste (/etc/dnsmasq)
+    dnsmasq:
+      #--- pihole.persistence.dnsmasq.existingClaimName specifies the name of existing persistent volumne claim to be used for Pi-hole dnsmasq filesystem 
+      existingClaimName: ""
+      #--- pihole.persistence.dnsmasq.storageClassName specifies the persistence storage class for the Pi-hole dnsmasq filesystem when existing claim is not used
+      storageClassName: ""
+      #--- pihole.persistence.dnsmasq.size specifies the storage size for the persistence volume of Pi-hole dnsmasq filesystem
+      size: 100Mi
+      #
+  #--- pihole.seviceAccount block is used to specify the RBAC service account settings for the Pi-hole deployment
+  serviceAccount:
+    #--- pihole.serviceAccount.create specifies whether a service account should be created for the Pi-hole deployment
+    create: true
+    #--- pihole.serviceAccount.automount is used to specify whether to automatically mount ServiceAccount's API credentials?
+    automount: true
+    #--- pihole.serviceAccount.annotations is used specify the annotations to be added to the service account
+    annotations: {}
+    #--- pihole.ServiceAccount.name is used to specify the name of the service account to use for Pi-hole deployment. 
+    name: ""
+    # If not set and create is true, a name is generated using the fullname template
+    #
+  #--- pihole.services block is used to specify the Pi-hole deployment services settings
+  services:
+    #--- pihole.services.admin block is used to specify the settings for Pi-hole admin dashboard service
+    admin:
+      #--- pihole.services.admin.type specifies the service type for the Pi-hole admin dashboard service. (Examples - ClusterIP, LoadBlancer, NodePort)
+      type: ClusterIP
+      #     
+    #--- pihole.services.dns block is used to specify the settings for the Pi-hole DNS service
+    dns:
+      #--- pihole.services.dns.loadBalancerIP specifies the custom Load Balancer IP for Pi-hole DNS service. If not set, will use IP allocated by the cluster load balancer.
+      loadBalancerIP: ""
+      #--- pihole.servoces.dns.externalTrafficPolicy specifies the external traffic policy for Pi-hole DNS service
+      externalTrafficPolicy: "Local"
+      #
+  #--- pihole.ingressRoute block is used to specify the settings for Pi-hole admin UI dasboard ingress route
+  ingressRoute:
+  # You have the option to use either ingress or ingressRoute for configuring the Pi-hole admin UI dashboard ingress
+    #--- pihole.ingressRoute.enabled specifies whether to use IngressRout for the Pi-hole admin UI dashboard ingress
+    enabled: false
+    #--- pihole.ingressRoute.ingressClassName specifies the IngressClass resource that contains ingress configuration, including the name of the Ingress controller
+    ingressClassName: ""      
+    #--- pihole.ingressRoute.annotations specifies the annotations for Pi-hole UI ingress route
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      #
+    #--- pihole.ingressRoute.entryPoints specifies the ingress route entrypoints for Pi-hole UI ingress
+    entryPoints: []
+      # - web
+      # - websecure  
+      #      
+    #--- pihole.ingressRoute.host specifies the domain name for the Pi-hole admin UI ingress
+    host: ""
+    #--- pihole.ingressRoute.tls block is used to specify TLS related settings for Pi-hole admin UI ingress route
+    tls: 
+      #--- pihole.ingressRoute.tls.enabled specifies whether enable TLS for Pi-hole admin UI ingress route
+      enabled: false
+      #--- pihole.ingressRoute.tls.secret specifes the secret name containg the TLS certificate for Pi-hole admin UI ingress domain
+      secret: ""
+      #--- pihole.ingressRoute.tls.cert block is used to specify the Pi-hole ingress domain's certificate issuer details
+      cert:
+      # This can be used to dynamically generate TLS certificates for the Pi-hole admin UI ingress domain
+        #--- pihole.ingressRoute.tls.cert.issuerName specifies the name of the certificate issuer for Pi-hole admin UI ingress domain
+        issuerName: ""
+        #--- pihole.ingressRoute.tls.cert.issuerType specifies the type of the certificate issuer. Example (ClusterIssuer, Issuer)
+        issuerType: ""
+        # Example
+        # issuerType: ClusterIssuer
+        #
+    #--- pihole.ingressRoute.secureBackends specifies whether to enable secure connections to the pihole admin dashboard service via port 443.
+    secureBackends: false      
+  #--- pihole.ingress block is used to specify the settings for Pi-hole admin UI dashboard ingress  
+  ingress:
+  # You have the option to use either ingress or ingressRoute for configuring the admin dashboard ingress  
+    #--- pihole.ingress.enabled specifes whether to use ingress for configuring Pi-hole admin UI dashboard ingress
+    enabled: false
+    #-- pihole.ingress.ingressClassName specifies the IngressClass resource that contains ingress configuration, including the name of the Ingress controller   
+    ingressClassName: ""
+    # ingressClassName can replace the kubernetes.io/ingress.class annotation used in earlier Kubxxernetes releases
+    #--- pihole.ingress.host specifies the domain name for the Pi-hole admin UI ingress
+    host: ""
+    #--- pihole.ingress.tls block is used to specify TLS related settings for Pi-hole admin UI ingress
+    tls: 
+      #--- pihole.ingress.tls.enabled specifies whether to enable TLS for Pi-hole admin UI ingress
+      enabled: false
+      #--- pihole.ingress.tls.secret specifes the secret name containg the TLS certificate for Pi-hole admin UI ingress domain
+      secret: ""
+      # Example
+      # secret: pihole.local-tls
+      #--- pihole.ingress.tls.cert block is used to specify the Pi-hole ingress domain's certificate issuer details
+      cert:
+      # This can be used to dynamically generate TLS certificates for the Pi-hole admin UI ingress domain
+        #--- pihole.ingress.tls.cert.issuerName specifies the name of the certificate issuer for Pi-hole admin UI ingress domain
+        issuerName: ""
+        #--- pihole.ingress.tls.cert.issuerType specifies the type of the certificate issuer. Example (ClusterIssuer, Issuer)
+        issuerType: ""
+        # Example
+        # issuerType: ClusterIssuer
+        #
+    #--- pihole.ingress.secureBackends specifies whether to enable secure connections to the pihole admin dashboard service via port 443.
+    secureBackends: false  
+    #--- pihole.Ingress annotations in the form of key-value pairs.
+    annotations: {}
+    #  kubernetes.io/ingress.class: nginx
+    #  kubernetes.io/tls-acme: true
+    ## If you're using kube-lego, you will want to add:
+    ## kubernetes.io/tls-acme: true
+    ##
+    ## For a full list of possible ingress annotations, please see
+    ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/annotations.md
+    ##
+    ## If tls is set to true, annotation ingress.kubernetes.io/secure-backends: "true" will automatically be set
+    #--- pihole.ingress.secrets specifies the Secret that contains a TLS private key and certificate. Use secrets if you want to use your own certificates to secure ingresses.
+    secrets: []
+    ## If you're providing your own certificates, please use this to add the certificates as secrets
+    ## key and certificate should start with -----BEGIN CERTIFICATE----- or
+    ## -----BEGIN RSA PRIVATE KEY-----
+    ##
+    ## name should line up with a tlsSecret set further up
+    ## If you're using kube-lego, this is unneeded, as it will create the secret for you if it is not set
+    ##
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    # - name: pihole.local-tls
+    #   key:
+    #   certificate:
