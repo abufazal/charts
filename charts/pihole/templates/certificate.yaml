@@ -1,10 +1,20 @@
-{{- if and .Values.pihole.ingressRoute.enabled .Values.pihole.ingressRoute.tls.enabled (empty .Values.pihole.ingressRoute.tls.secret) }}
+{{- if and (eq (include "pihole.enableIngressRoute" . | trim) "true") (eq (include "pihole.enableIngress" . | trim) "true") -}}
+  {{- fail "Both .Values.pihole.ingressRoute.enabled and .Values.pihole.ingress.enabled are set to true. Use either ingress or ingressRoute" -}}
+{{- end -}}
+
+{{- $useIngressRoute := (eq (include "pihole.enableIngressRoute" . | trim) "true") -}}
+{{- $tls := $useIngressRoute | ternary .Values.pihole.ingressRoute.tls .Values.pihole.ingress.tls -}}
+{{- $host := $useIngressRoute | ternary .Values.pihole.ingressRoute.host .Values.pihole.ingress.host -}}
+{{- $issuerName := $useIngressRoute | ternary .Values.pihole.ingressRoute.tls.cert.issuerName .Values.pihole.ingress.tls.cert.issuerName -}}
+{{- $issuerType := $useIngressRoute | ternary .Values.pihole.ingressRoute.tls.cert.issuerType .Values.pihole.ingress.tls.cert.issuerType -}}
+
+{{- if and $tls.enabled (empty $tls.secret) -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ include "pihole.domainCertName" . }}
   labels:
-    {{- include "pihole.labels" . | nindent 4 }}  
+    {{- include "pihole.labels" . | nindent 4 }}
   namespace: cert-manager
 spec:
   secretTemplate:
@@ -14,15 +24,12 @@ spec:
       reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: {{ .Release.Namespace }}
       reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: {{ include "pihole.reflectNamespaces" . }}
     labels:
-      {{- include "pihole.labels" . | nindent 6 }}  
+      {{- include "pihole.labels" . | nindent 6 }}
   secretName: {{ include "pihole.domainCertSecretName" . }}
   issuerRef:
-    {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.tls.cert.issuerName "Error: Certificate Issuer Name .Values.pihole.ingressRoute.tls.cert.issuerName is not provided" -}}
-    name: {{ .Values.pihole.deployment.ingressRoute.domain.cert.issuer.name }}
-    {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.tls.cert.issuerType "Error: Certificate Issuer Type .Values.pihole.ingressRoute.tls.cert.issuerType is not provided" -}}
-    kind: {{ .Values.pihole.deployment.ingressRoute.domain.cert.issuer.type }}
-  {{- include "pihole.validateValue" list .Values.pihole.ingressRoute.host "Error: IngressRoute host is not provided" -}}
-  commonName: {{ .Values.pihole.deployment.ingressRoute.host }}
+    name: {{ required "Error: Certificate Issuer Name is not provided" $issuerName }}
+    kind: {{ required "Error: Certificate Issuer Type is not provided" $issuerType }}
+  commonName: {{ required "Error: Ingress Host is not provided" $host }}
   dnsNames:
-  - {{ .Values.pihole.deployment.ingressRoute.host }}
+    - {{ $host }}
 {{- end }}

@@ -7,13 +7,13 @@ metadata:
     {{- include "pihole.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.pihole.deployment.autoscaling.enabled }}
-    {{- if .Values.pihole.deployment.persistence.enabled }}
+    {{- if .Values.pihole.persistence.enabled }}
   replicas: {{ .Values.pihole.deployment.replicas }}
     {{- else }}
   replicas: 1
     {{- end }}
   {{- else }}
-    {{- if not .Values.pihole.deployment.persistence.enabled }}
+    {{- if not .Values.pihole.persistence.enabled }}
   replicas: 1
     {{- end }}
   {{- end }}
@@ -43,9 +43,67 @@ spec:
         - name: {{ .Chart.Name }}
           env:
             - name: TZ
-              value: {{ .Values.pihole.timeZone }}
+              value: {{ default "Asia/Kolkata" .Values.pihole.timeZone | quote }}
+            - name: TEMPERATUREUNIT
+              value: {{ default "c" .Values.pihole.dashboard.temperatureUnit | quote }}
+            - name: QUERY_LOGGING
+              value: {{ default true .Values.pihole.queryLogging | quote }}
+            - name: WEBUIBOXEDLAYOUT
+              value: {{ default true .Values.pihole.dashboard.boxedLayout | ternary "boxed" "traditional" | quote }}
+            - name: WEBTHEME
+              value: {{ default "default-auto" .Values.pihole.dashboard.theme | quote }}
+            - name: WEBPASSWORD_FILE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pihole.adminSecret" . }}
+                  key: webpassword
+            - name: PIHOLE_DNS_
+              value: {{ default (list "1.1.1.1" "1.1.1.2") .Values.pihole.upstream | join ";" | quote }}
+            - name: DNSSEC
+              value: {{ default true .Values.pihole.dnssec.enabled | quote }}
+            - name: DNS_BOGUS_PRIV
+              value: {{ default false .Values.pihole.privateRangeForwarding.enabled  | ternary "false" "true" | quote }}
+            - name: DNS_FQDN_REQUIRED
+              value: {{ default true .Values.pihole.requiredFqdn | quote }}
+            - name: REV_SERVER
+              value: {{ default false .Values.pihole.reverseServer.enabled | quote }}
+            {{- if .Values.pihole.reverseServer.enabled -}}
+            - name: REV_SERVER_DOMAIN
+              value: {{ .Values.pihole.reverseServer.domain | quote }}
+            - name: REV_SERVER_TARGET
+              value: {{ .Values.pihole.reverseServer.target | quote }}  
+            - name: REV_SERVER_CIDR
+              value: {{ .Values.pihole.reverseServer.cidr | quote }}
+            {{- end }}
           securityContext:
-            {{- toYaml .Values.pihole.deployment.securityContext | nindent 12 }}
+            {{- if .Values.pihole.deployment.securityContext }}
+            capabilities:
+              {{- if not .Values.pihole.deployment.securityContext.capabilities }}
+              add:
+                - NET_ADMIN
+              {{- else }}
+              add:
+                {{- $defaultCapabilities := list "NET_ADMIN" }}
+                {{- $additionalCapabilities := .Values.pihole.deployment.securityContext.capabilities.add | default (list) }}
+                {{- range $capability := $defaultCapabilities }}
+                - {{ $capability }}
+                {{- end }}
+                {{- range $capability := $additionalCapabilities }}
+                  {{- if ne $capability "NET_ADMIN" }}
+                - {{ $capability }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+            {{- range $key, $value := .Values.pihole.deployment.securityContext }}
+              {{- if ne $key "capabilities" }}
+            {{ $key }}: {{ if kindIs "map" $value }}{{ toYaml $value | nindent 14 }}{{ else }}{{ $value | quote }}{{ end }}
+              {{- end }}
+            {{- end }}  
+          {{- else }}
+            capabilities:
+              add:
+                - NET_ADMIN
+            {{- end }}
           image: {{ include "pihole.image" . }}
           imagePullPolicy: {{ .Values.pihole.image.pullPolicy }}
           ports:
@@ -74,7 +132,7 @@ spec:
             {{- if .Values.pihole.deployment.volumeMounts }}
             {{- toYaml .Values.pihole.deployment.volumeMounts | nindent 12 }}
             {{- end }}
-            {{- if .Values.pihole.deployment.persistence.enabled }}
+            {{- if .Values.pihole.persistence.enabled }}
             - name: pvc-etc
               mountPath: /etc/pihole
             - name: pvc-dnsmasq
@@ -84,10 +142,10 @@ spec:
         {{- if .Values.pihole.deployment.volumes }}
         {{- toYaml .Values.pihole.deployment.volumes | nindent 8 }}
         {{- end }}
-        {{- if .Values.pihole.deployment.persistence.enabled }}
+        {{- if .Values.pihole.persistence.enabled }}
         - name: pvc-etc
           persistentVolumeClaim:
-            claimName: {{ include "pihole.piholePVCName" . }}
+            claimName: {{ include "pihole.dataPVCName" . }}
         - name: pvc-dnsmasq
           persistentVolumeClaim:
             claimName: {{ include "pihole.dnsmasqPVCName" . }}

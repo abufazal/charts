@@ -13,16 +13,12 @@ spec:
   minReplicas: {{ default 1 .Values.pihole.deployment.autoscaling.minReplicas }}
   maxReplicas: {{ default 3 .Values.pihole.deployment.autoscaling.maxReplicas }}
   metrics:
+    {{- range $resource := (list "cpu" "memory") }}
     - type: Resource
       resource:
-        name: cpu
+        name: {{ $resource }}
         target:
           type: Utilization
-          averageUtilization: {{ default 80 .Values.pihole.deployment.autoscaling.targetCPUUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: {{ default 80 .Values.pihole.deployment.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ default 80 (index .Values.pihole.deployment.autoscaling (printf "target%sUtilizationPercentage" (camelcase $resource))) }}
+    {{- end }}
 {{- end }}

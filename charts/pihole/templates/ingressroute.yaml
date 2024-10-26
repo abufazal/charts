@@ -1,9 +1,11 @@
-{{- if .Values.pihole.deployment.ingressRoute.enabled }}
-  {{- if .Values.pihole.deployment.ingressRoute.className }}
-    {{- if not (hasKey .Values.pihole.deployment.ingressRoute.annotations "kubernetes.io/ingress.class") }}
-    {{- $_ := set .Values.pihole.deployment.ingressRoute.annotations "kubernetes.io/ingress.class" .Values.pihole.deployment.ingressRoute.ingressClassName }}
+{{- if and (eq (include "pihole.enableIngressRoute" . | trim) "true") (eq (include "pihole.enableIngress" . | trim) "false") }}
+  {{- $ingressClassName := required "Error - Ingress class name .Values.pihole.ingressRoute.ingressClassName is not provided for IngressRoute" .Values.pihole.ingressRoute.ingressClassName }}
+  {{- if $ingressClassName }}
+    {{- if not (hasKey .Values.pihole.ingressRoute.annotations "kubernetes.io/ingress.class") }}
+      {{- $_ := set .Values.pihole.ingressRoute.annotations "kubernetes.io/ingress.class" $ingressClassName }}
     {{- end }}
   {{- end }}
+
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -11,14 +13,16 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "pihole.labels" . | nindent 4 }}
-  {{- with .Values.pihole.deployment.ingressRoute.annotations }}
+  {{- with .Values.pihole.ingressRoute.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   entryPoints:
-    {{- include "pihole.validateValue" list .Values.pihole.deployment.ingressRoute.entryPoints "Error - Ingress entrypoint is not provided." -}}
-    {{- range .Values.pihole.deployment.ingressRoute.entryPoints }}
+    {{- if and (not .Values.pihole.ingressRoute.entryPoints) (eq (len .Values.pihole.ingressRoute.entryPoints) 0) -}}
+      {{ fail "Error: IngressRoute entrypoint .Values.pihole.ingressRoute.entryPoints is not provided."}}
+    {{- end }}
+    {{- range .Values.pihole.ingressRoute.entryPoints }}
     - {{ . }}
     {{- end }}
   routes:
@@ -27,8 +31,8 @@ spec:
       services:
         - name: {{ include "pihole.adminServiceName" . }}
           namespace: {{ .Release.Namespace }}
-          port: 80
-  {{- if and (not (empty .Values.pihole.deployment.ingressRoute.domain.cert.issuer.name)) (not (empty .Values.pihole.deployment.ingressRoute.domain.cert.issuer.type)) }}
+          port: {{ .Values.pihole.ingressRoute.secureBackends | ternary 443 80 }} 
+  {{- if .Values.pihole.ingressRoute.tls.enabled }}
   tls:
     secretName: {{ include "pihole.domainCertSecretName" . }}
   {{- end }}

@@ -1,11 +1,13 @@
-{{- if and .Values.pihole.deployment.persistence.enabled }}
-  {{- if not .Values.pihole.deployment.persistence.pihole.existingClaimName }}
+{{- $enablePersistence := default false .Values.pihole.persistence.enabled }}
+
+{{- if $enablePersistence }}
+{{- if not .Values.pihole.persistence.data.existingClaimName }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "pihole.piholePVCName" . }}
+  name: {{ include "pihole.dataPVCName" . }}
   namespace: {{ .Release.Namespace }}
-  {{- if .Values.persistence.keep }}
+  {{- if .Values.pihole.persistence.keep }}
   annotations:
     "helm.sh/resource-policy": keep
   {{- end }}
@@ -14,21 +16,20 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  {{- include "pihole.validateValue" list .Values.pihole.deployment.persistence.pihole.storageClassName "Error - Storage class name is not provider for pihole volume" -}}  
-  storageClassName: {{ .Values.persistence.pihole.storageClassName }}
+  storageClassName: {{ required "Error - Storage class name is required for data volume" .Values.pihole.persistence.data.storageClassName }}
   resources:
     requests:
-      storage: {{ .Values.persistence.pihole.size | default "4Gi" }}
-  {{- end -}}
+      storage: {{ default "4Gi" .Values.pihole.persistence.data.size }}
+{{- end }}
 
-  {{- if not .Values.pihole.deployment.persistence.dnsmasq.existingClaimName }}
+{{- if not .Values.pihole.persistence.dnsmasq.existingClaimName }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "pihole.dnsmasqPVCName" . }}
   namespace: {{ .Release.Namespace }}
-  {{- if .Values.persistence.keep }}
+  {{- if .Values.pihole.persistence.keep }}
   annotations:
     "helm.sh/resource-policy": keep
   {{- end }}
@@ -37,10 +38,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  {{- include "pihole.validateValue" list .Values.pihole.deployment.persistence.dnsmasq.storageClassName "Error - Storage class name is not provider for dnsmasq volume" -}}  
-  storageClassName: {{ .Values.persistence.dnsmasq.storageClassName }}
+  storageClassName: {{ required "Error - Storage class name is required for dnsmasq volume" .Values.pihole.persistence.dnsmasq.storageClassName }}
   resources:
     requests:
-      storage: {{ .Values.persistence.dnsmasq.size | default "100Mi" }}      
-  {{- end -}}      
-{{- end -}}
+      storage: {{ default "100Mi" .Values.pihole.persistence.dnsmasq.size }}      
+{{- end }}      
+
+{{- end }}
