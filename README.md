@@ -13,7 +13,7 @@ helm repo add <repo_name> https://abufazal.github.io/charts
 Example:
 
 ```bash
-helm repo add abufazal https://abufazal.github.io/charts
+helm repo add myrepo https://abufazal.github.io/charts
 ```
 
 You can refer to chart specific README files for instruction and guidelines related to individual charts
