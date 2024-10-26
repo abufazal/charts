@@ -3,6 +3,24 @@ entries:
   pihole:
   - apiVersion: v2
     appVersion: latest
+    created: "2024-10-26T23:41:51.151829929Z"
+    description: A Helm chart for Pi-hole deployment in Kubernetes
+    digest: 44d80ab8f773a1ca4aa93993b3c632e31b24768fb394b05fb827ae31105613d4
+    icon: https://upload.wikimedia.org/wikipedia/commons/0/00/Pi-hole_Logo.png
+    maintainers:
+    - email: abbas0013@gmail.com
+      name: Abu Fazal Abbas
+      url: https://github.com/abufazal
+    name: pihole
+    sources:
+    - https://github.com/abufazal/charts/
+    - https://github.com/abufazal/charts/pihole
+    type: application
+    urls:
+    - pihole-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v2
+    appVersion: latest
     created: "2024-10-12T09:52:36.525801858Z"
     description: A Helm chart for pihole
     digest: 60be9e433c95cb585a53fd46dd532aea32786705e3b8e670783fca8952ebcec3
@@ -17,4 +35,4 @@ entries:
     urls:
     - pihole-0.1.3.tgz
     version: 0.1.3
-generated: "2024-10-12T09:52:36.525807679Z"
+generated: "2024-10-26T23:41:51.151842472Z"
