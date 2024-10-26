@@ -8,7 +8,7 @@ Source Code can be found here: <https://github.com/pi-hole/pi-hole/>
 ## Prerequisites
 
 1. [x] Helm **v3 > 3.9.0** [installed](https://helm.sh/docs/using_helm/#installing-helm): `helm version`
-2. [x] abufazal's chart repository: `helm repo add abufazal https://abufazal.github.io/charts`
+2. [x] abufazal's chart repository: `helm repo add myrepo https://abufazal.github.io/charts`
 
 ### Additional Prerequisites 
 Following list of additional prerequisites needs to be met, when using specific featurs.
