@@ -14,7 +14,7 @@ Source Code can be found here: <https://github.com/pi-hole/pi-hole/>
 Following list of additional prerequisites needs to be met, when using specific featurs.
 
 #### Additional Prerequisites - HA 
-To be able to configure Pi-Hole in HA mode, we would need some kind of persitent volume with `ReadWriteMany` access mode such that the Pi-Hole data can be accessed bu all HA pods simulataneously. 
+To be able to configure Pi-Hole in HA mode, we would need some kind of persitent volume with `ReadWriteMany` access mode such that the Pi-Hole data can be accessed by all HA pods simulataneously. 
 
 Ensure following prerequisites are met for HA to work
 
@@ -42,9 +42,9 @@ Example:
 helm install dnsPrimary abufazal/pihole
 ```
 
-You can customize the install with a `values` file.
+You can customize the install with a `values` file. Create a copy of the default [value](value.yaml) file and update or customize the parameters based on your requirements.
 
-Complete documentation on all available parameters is in the [default file](values.yaml).
+Complete documentation on all available parameters is in the [default value file](values.yaml).
 
 ```bash
 helm install -f myvalues.yaml dnsPrimary abufazal/pihole
@@ -56,3 +56,4 @@ helm install -f myvalues.yaml dnsPrimary abufazal/pihole
 3. [x] Inbuilt support for ingress creation
 4. [x] Inbuilt support for SSL/TLS certificate generation
 5. [x] Inbuilt support to retain persistent volumes during release upgrades and uninstallation
+6. [x] Inbuilt support to configure Pi-hole settings like timezone, query logging, upstream, theme, layout etc.
