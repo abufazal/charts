@@ -34,4 +34,5 @@ This is a open source repository and I welcome contributions to enhance the func
 ## Guidelines
 
 1. Use the Issues section to report any issues or request new features
+2. Use the Discussion board for generic discssions related to the charts
 2. Raise a PR, if you would like to contibute any changes to these customized charts
